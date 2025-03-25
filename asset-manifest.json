@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/mindbytes-demo/static/css/main.f855e6bc.css",
+    "main.js": "/mindbytes-demo/static/js/main.4413164c.js",
+    "static/js/453.4405e46a.chunk.js": "/mindbytes-demo/static/js/453.4405e46a.chunk.js",
+    "index.html": "/mindbytes-demo/index.html",
+    "main.f855e6bc.css.map": "/mindbytes-demo/static/css/main.f855e6bc.css.map",
+    "main.4413164c.js.map": "/mindbytes-demo/static/js/main.4413164c.js.map",
+    "453.4405e46a.chunk.js.map": "/mindbytes-demo/static/js/453.4405e46a.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f855e6bc.css",
+    "static/js/main.4413164c.js"
+  ]
+}
