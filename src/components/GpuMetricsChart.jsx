@@ -25,37 +25,47 @@ const GpuMetricsChart = () => {
     memBytes: "steelblue",
   };
 
-  const files = {
-    util: "/data/gpu_util_percent.csv",
-    memPercent: "/data/gpu_mem_alloc_percent.csv",
-    memBytes: "/data/gpu_mem_alloc_bytes.csv",
-  };
-
   useEffect(() => {
-    const loadCSV = async (key, path) => {
-      const res = await fetch(path);
-      const text = await res.text();
-      Papa.parse(text, {
-        header: true,
-        dynamicTyping: true,
-        complete: (result) => {
-          const rows = result.data.filter(
-            (row) =>
-              typeof row[Object.keys(row)[0]] === "number" &&
-              typeof row[Object.keys(row)[1]] === "number"
-          );
-
-          const timeCol = rows.map((row) => row[Object.keys(row)[0]]);
-          const valueCol = rows.map((row) => row[Object.keys(row)[1]]);
-
-          setMetrics((prev) => ({ ...prev, [key]: valueCol }));
-          if (!time.length) setTime(timeCol);
-        },
-      });
+    const basePath = process.env.PUBLIC_URL || "";
+    const files = {
+      util: `${basePath}/data/gpu_util_percent.csv`,
+      memPercent: `${basePath}/data/gpu_mem_alloc_percent.csv`,
+      memBytes: `${basePath}/data/gpu_mem_alloc_bytes.csv`,
     };
 
-    Object.entries(files).forEach(([key, path]) => loadCSV(key, path));
-  }, []);
+    const loadCSV = async (key, path) => {
+      try {
+        console.log(`📦 Fetching ${key} from ${path}`);
+        const res = await fetch(path);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+
+        Papa.parse(text, {
+          header: true,
+          dynamicTyping: true,
+          complete: (result) => {
+            const rows = result.data.filter(
+              (row) =>
+                typeof row[Object.keys(row)[0]] === "number" &&
+                typeof row[Object.keys(row)[1]] === "number"
+            );
+
+            const timeCol = rows.map((row) => row[Object.keys(row)[0]]);
+            const valueCol = rows.map((row) => row[Object.keys(row)[1]]);
+
+            setMetrics((prev) => ({ ...prev, [key]: valueCol }));
+            if (!time.length) setTime(timeCol);
+          },
+        });
+      } catch (err) {
+        console.error(`Failed to fetch ${key}:`, err);
+      }
+    };
+
+    Object.entries(files).forEach(([key, path]) => {
+      loadCSV(key, path);
+    });
+  }, [time.length]);
 
   useEffect(() => {
     if (!metrics[selectedMetric].length || !time.length) return;
@@ -72,10 +82,7 @@ const GpuMetricsChart = () => {
       },
       yaxis: {
         title: { text: label },
-        range: [
-          Math.min(...yValues) * 0.95,
-          Math.max(...yValues) * 1.05,
-        ],
+        range: [Math.min(...yValues) * 0.95, Math.max(...yValues) * 1.05],
       },
       width: 900,
       height: 500,
