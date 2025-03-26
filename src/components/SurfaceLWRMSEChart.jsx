@@ -8,50 +8,57 @@ const SurfaceLWRMSEChart = () => {
   const [animationMode, setAnimationMode] = useState("static");
   const [datasets, setDatasets] = useState({});
 
+  const basePath = process.env.PUBLIC_URL || "";
+
   const config = {
     "2m_train_temp": {
       label: "Train_2m_Temp",
-      path: "/data/2m_train_temp.csv",
+      path: `${basePath}/data/2m_train_temp.csv`,
       color: "steelblue",
     },
     "2m_val_temp": {
       label: "Val_2m_temp",
-      path: "/data/2m_val_temp.csv",
+      path: `${basePath}/data/2m_val_temp.csv`,
       color: "green",
     },
     "10m_u_train_wind": {
       label: "Train_10mU_Wind",
-      path: "/data/10m_u_train_wind.csv",
+      path: `${basePath}/data/10m_u_train_wind.csv`,
       color: "steelblue",
     },
     "10m_u_val_wind": {
       label: "Val_10m_U_Wind",
-      path: "/data/10m_u_val_wind.csv",
+      path: `${basePath}/data/10m_u_val_wind.csv`,
       color: "green",
     },
   };
 
   useEffect(() => {
     const loadCSV = async (key, path) => {
-      const res = await fetch(path);
-      const text = await res.text();
-      Papa.parse(text, {
-        header: true,
-        dynamicTyping: true,
-        complete: (result) => {
-          const rows = result.data.filter(
-            (row) =>
-              typeof row[Object.keys(row)[0]] === "number" &&
-              typeof row[Object.keys(row)[1]] === "number"
-          );
-          const step = rows.map((r) => r[Object.keys(r)[0]]);
-          const value = rows.map((r) => r[Object.keys(r)[1]]);
-          setDatasets((prev) => ({
-            ...prev,
-            [key]: { step, value },
-          }));
-        },
-      });
+      try {
+        const res = await fetch(path);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        Papa.parse(text, {
+          header: true,
+          dynamicTyping: true,
+          complete: (result) => {
+            const rows = result.data.filter(
+              (row) =>
+                typeof row[Object.keys(row)[0]] === "number" &&
+                typeof row[Object.keys(row)[1]] === "number"
+            );
+            const step = rows.map((r) => r[Object.keys(r)[0]]);
+            const value = rows.map((r) => r[Object.keys(r)[1]]);
+            setDatasets((prev) => ({
+              ...prev,
+              [key]: { step, value },
+            }));
+          },
+        });
+      } catch (err) {
+        console.error(`Failed to load ${key}:`, err);
+      }
     };
 
     Object.entries(config).forEach(([key, { path }]) =>
@@ -125,7 +132,7 @@ const SurfaceLWRMSEChart = () => {
       Plotly.newPlot(plotRef.current, [trace], layout).then(() => {
         Plotly.animate(plotRef.current, frames, {
           frame: { duration: 5, redraw: true },
-          transition: { duration: 100},
+          transition: { duration: 100 },
         });
       });
     }

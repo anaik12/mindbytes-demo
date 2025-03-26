@@ -8,29 +8,31 @@ const AtmosphericLWRMSEChart = () => {
   const [animationMode, setAnimationMode] = useState("static");
   const [datasets, setDatasets] = useState({});
 
+  const basePath = process.env.PUBLIC_URL || "";
+
   const config = {
     train_humidity: {
       label: "Train_Specific_Humidity (1000 hPa)",
-      path: "/data/train_humidity_1000.csv",
+      path: `${basePath}/data/train_humidity_1000.csv`,
       color: "steelblue",
     },
     val_humidity: {
       label: "Val_Specific_Humidity (1000 hPa)",
-      path: "/data/val_humidity_1000.csv",
+      path: `${basePath}/data/val_humidity_1000.csv`,
       color: "green",
     },
     train_geopotential: {
       label: "Train_Geopotential(1000 hPa)",
-      path: "/data/train_geopotential_1000.csv",
+      path: `${basePath}/data/train_geopotential_1000.csv`,
       color: "steelblue",
     },
     val_geopotential: {
       label: "Val_Geopotential (1000 hPa)",
-      path: "/data/val_geopotential_1000.csv",
+      path: `${basePath}/data/val_geopotential_1000.csv`,
       color: "green",
     },
   };
-
+  
   useEffect(() => {
     const loadCSV = async (key, path) => {
       const res = await fetch(path);
