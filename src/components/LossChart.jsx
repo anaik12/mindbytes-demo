@@ -10,30 +10,38 @@ const LossChart = () => {
   const [animationMode, setAnimationMode] = useState("static");
 
   const loadCSV = async (path, setStepFn, setLossFn) => {
-    const res = await fetch(path);
-    const text = await res.text();
-    Papa.parse(text, {
-      header: true,
-      dynamicTyping: true,
-      complete: (result) => {
-        const rows = result.data.filter(
-          (row) =>
-            typeof row[Object.keys(row)[0]] === "number" &&
-            typeof row[Object.keys(row)[1]] === "number"
-        );
+    try {
+      console.log("📦 Fetching", path);
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
 
-        const stepCol = rows.map((row) => row[Object.keys(row)[0]]);
-        const lossCol = rows.map((row) => row[Object.keys(row)[1]]);
+      Papa.parse(text, {
+        header: true,
+        dynamicTyping: true,
+        complete: (result) => {
+          const rows = result.data.filter(
+            (row) =>
+              typeof row[Object.keys(row)[0]] === "number" &&
+              typeof row[Object.keys(row)[1]] === "number"
+          );
 
-        if (setStepFn) setStepFn(stepCol);
-        setLossFn(lossCol);
-      },
-    });
+          const stepCol = rows.map((row) => row[Object.keys(row)[0]]);
+          const lossCol = rows.map((row) => row[Object.keys(row)[1]]);
+
+          if (setStepFn) setStepFn(stepCol);
+          setLossFn(lossCol);
+        },
+      });
+    } catch (err) {
+      console.error(` Failed to load ${path}:`, err);
+    }
   };
 
   useEffect(() => {
-    loadCSV("/data/train_loss.csv", setSteps, setTrainLoss);
-    loadCSV("/data/val_loss.csv", null, setValLoss);
+    const basePath = process.env.PUBLIC_URL || "";
+    loadCSV(`${basePath}/data/train_loss.csv`, setSteps, setTrainLoss);
+    loadCSV(`${basePath}/data/val_loss.csv`, null, setValLoss);
   }, []);
 
   useEffect(() => {
@@ -65,7 +73,7 @@ const LossChart = () => {
           type: "scatter",
           mode: "lines+markers",
           name: "Train Loss",
-          line: { color: "steelblue", width: 1.5},
+          line: { color: "steelblue", width: 1.5 },
           marker: { size: 3 },
         },
         {
@@ -74,7 +82,7 @@ const LossChart = () => {
           type: "scatter",
           mode: "lines+markers",
           name: "Val Loss",
-          line: { color: "green", width: 1.5},
+          line: { color: "green", width: 1.5 },
           marker: { size: 3 },
         },
       ];
@@ -101,7 +109,7 @@ const LossChart = () => {
           type: "scatter",
           mode: "lines+markers",
           name: "Train Loss",
-          line: { color: "steelblue" , width: 1.5 },
+          line: { color: "steelblue", width: 1.5 },
           marker: { size: 3 },
         },
         {
@@ -110,15 +118,15 @@ const LossChart = () => {
           type: "scatter",
           mode: "lines+markers",
           name: "Val Loss",
-          line: { color: "green" , width: 1.5 },
-          marker: { size: 3},
+          line: { color: "green", width: 1.5 },
+          marker: { size: 3 },
         },
       ];
 
       Plotly.newPlot(plotRef.current, data, layout).then(() => {
         Plotly.animate(plotRef.current, frames, {
           frame: { duration: 100, redraw: true },
-          transition: { duration: 1000},
+          transition: { duration: 1000 },
         });
       });
     }
