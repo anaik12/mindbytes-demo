@@ -4,11 +4,13 @@ import LossChart from './components/LossChart';
 import GpuMetricsChart from './components/GpuMetricsChart';
 import SurfaceLWRMSEChart from './components/SurfaceLWRMSEChart';
 import AtmosphericLWRMSEChart from './components/AtmosphericLWRMSEChart';
+import TestCsvLoader from './components/TestCsvLoader';
 
 function App() {
   return (
     <div className="App">
-      <h1>Mindbytes Demo</h1>
+      <h1>Lighthouse Initiative: Training climate models on Polaris cluster</h1>
+      {/* <TestCsvLoader /> */}
 
       <div style={{ display: 'flex', gap: '2rem', marginBottom: '2rem' }}>
         <div style={{ flex: 1 }}>
