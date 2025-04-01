@@ -9,7 +9,7 @@ import TestCsvLoader from './components/TestCsvLoader';
 function App() {
   return (
     <div className="App">
-      <h1>Lighthouse Initiative: Training climate models on Polaris cluster</h1>
+      <h1>ALCF-UChicago Lighthouse Initiative: Climate AI Models</h1>
       {/* <TestCsvLoader /> */}
 
       <div style={{ display: 'flex', gap: '2rem', marginBottom: '2rem' }}>
